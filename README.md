@@ -20,4 +20,5 @@ The file "CurrentROM.txt" will automatically change when moving to a new ROM. Fe
 Future builds will hopefully have the following:
 
 1. Ability to determine a swap order rather than having games shuffled.
+2. Auto-remove DeleteMe files.
 2. Code cleanup.
