@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <minTime>5</minTime>
+  <maxTime>30</maxTime>
+  <seedOutput>61124389</seedOutput>
+  <countdown>true</countdown>
+  <changeCount>0</changeCount>
+</settings>
