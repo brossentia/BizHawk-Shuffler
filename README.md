@@ -6,10 +6,11 @@ This version works specifically with a developmental build of BizHawk. Future of
 Should be simple to get working! To use the shuffler, do the following:
 
 1. Put ROMs into a "CurrentROMs" folder located in the same folder as SoloShuffler.lua. You may leave ROMs in a .zip, but do not leave them in a folder.
-2. Run RaceShufflerSetup.exe to set your seed, your min/max time, and whether or not you want an on-screen three-second countdown for the upcoming swap.
-2. Open Bizhawk.
-3. Open a ROM for each console (NES, SNES, etc.) you're using, and map controls for them.
-4. Go to Tools > Lua, then load the SoloShuffler.lua script.
+2. Delete the "DeleteMe" files in the two ROM folders.
+3. Run RaceShufflerSetup.exe to set your seed, your min/max time, and whether or not you want an on-screen three-second countdown for the upcoming swap.
+4. Open Bizhawk.
+5. Open a ROM for each console (NES, SNES, etc.) you're using, and map controls for them.
+6. Go to Tools > Lua, then load the SoloShuffler.lua script.
 5. Enjoy!
 
 If you wish to change the min/max times, add/remove games during playthrough, add a countdown on the screen, and randomize the seed (recommended), open the RaceShufflerSetup.exe.
