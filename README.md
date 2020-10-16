@@ -23,3 +23,4 @@ Future builds will hopefully have the following:
 2. Auto-remove DeleteMe files.
 2. Code cleanup.
 2. Add source code to this repository for the setup program.
+2. Fix issue where min/max times break the script if the same or if min is greater than max.
