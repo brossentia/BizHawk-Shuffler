@@ -15,6 +15,8 @@ Should be simple to get working! To use the shuffler, do the following:
 
 If you wish to change the min/max times, add/remove games during playthrough, add a countdown on the screen, and randomize the seed (recommended), open the RaceShufflerSetup.exe.
 
+Please note: If you move from 2 ROMs down to 1, only switch while playing the final game. Otherwise, the shuffler will stay on the one you just completed. I'll be fixing this later!
+
 The file "CurrentROM.txt" will automatically change when moving to a new ROM. Feel free to use this for your OBS layout.
 
 Future builds will hopefully have the following:
@@ -24,3 +26,4 @@ Future builds will hopefully have the following:
 2. Code cleanup.
 2. Add source code to this repository for the setup program.
 2. Fix issue where min/max times break the script if the same or if min is greater than max.
+2. Clear up confusion moving from 2 ROMs down to 1.
