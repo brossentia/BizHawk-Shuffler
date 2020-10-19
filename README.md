@@ -23,7 +23,4 @@ Future builds will hopefully have the following:
 
 1. Ability to determine a swap order rather than having games shuffled.
 2. Auto-remove DeleteMe files.
-2. Code cleanup.
 2. Add source code to this repository for the setup program.
-2. Fix issue where min/max times break the script if the same or if min is greater than max.
-2. Clear up confusion moving from 2 ROMs down to 1.
