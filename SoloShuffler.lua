@@ -23,12 +23,21 @@ end
 databaseSize = userdata.get("databaseSize")
 
 
+function ends_with(str, ending)
+   return ending == "" or str:sub(-#ending) == ending
+end
+
 function dirLookup(directory) -- Reads all ROM names in the CurrentROMs folder.
 	i = 0
 	for directory in io.popen([[dir ".\CurrentROMs" /b]]):lines() do
-		i = i + 1
-		userdata.set("rom" .. i,directory)
-		romSet[i] = directory
+		if ends_with(directory, ".bin") then
+			console.log("SKIP: " .. directory)
+		else
+			console.log("ROM: " .. directory)
+			i = i + 1
+			userdata.set("rom" .. i,directory)
+			romSet[i] = directory
+		end
 	end
 	databaseSize = i
 	console.log("databaseSize is " .. databaseSize)
@@ -92,6 +101,13 @@ while i < databaseSize do
 end
 
 console.log("Time Limit " .. timeLimit)
+
+-- Pause after a swap
+sound = client.GetSoundOn()
+client.SetSoundOn(false)
+client.sleep(500)  -- TODO: This should be configurable
+client.SetSoundOn(sound)
+
 
 function cleanup()
 	userdata.clear()
