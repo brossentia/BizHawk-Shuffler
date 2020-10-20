@@ -122,6 +122,8 @@ while i < databaseSize do
 	romSet[i] = userdata.get("rom" .. i)
 end
 
+--Commenting delay out until we implement it in the setup bot. Feel free to use it yourself.
+--[[
 console.log("Time Limit " .. timeLimit)
 
 -- Pause after a swap
@@ -129,7 +131,7 @@ sound = client.GetSoundOn()
 client.SetSoundOn(false)
 client.sleep(500)  -- TODO: This should be configurable
 client.SetSoundOn(sound)
-
+]]
 
 function cleanup()
 	userdata.clear()
