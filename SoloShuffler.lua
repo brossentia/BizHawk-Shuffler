@@ -142,7 +142,7 @@ function nextGame(game) -- Changes to the next game and saves the current settin
 	if databaseSize > 0 then
 		getSettings(settingsPath)
 		diff = 0
-		if userdata.get("currentGameCounter") ~= nil then
+		if userdata.get("currentGameCounter") ~= nil then -- Allows for sequential play order
 			currentGameCounter = userdata.get("currentGameCounter");
 		else
 			currentGameCounter = 1
