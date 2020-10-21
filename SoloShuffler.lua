@@ -103,7 +103,7 @@ if databaseSize ~= nil then
 	if lowTime ~= highTime then
 		timeLimit = math.random(lowTime * 60,highTime * 60)
 	else
-		timeLimit = highTime
+		timeLimit = tonumber(highTime * 60)
 	end
 else 
 	getSettings(settingsPath)
