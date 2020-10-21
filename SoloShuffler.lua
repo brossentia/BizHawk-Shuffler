@@ -17,6 +17,7 @@ currentGame = 1
 c = {}
 readOldTime = ""
 saveOldTime = 0
+savePlayCount = 0
 
 if userdata.get("currentChangeCount") ~= nil then -- Syncs up the last time settings changed so it doesn't needlessly read the CurrentROMs folder again.
 	currentChangeCount = userdata.get("currentChangeCount")
@@ -33,9 +34,22 @@ function openCurrentTime(rom)
 	end
 	oldTime:close()
 	saveOldTime = readOldTime
+	oldCount = io.open(".\\PlayCount\\" .. currentGame .. ".txt","a+")
+	readOldCountString = oldCount:read("*line")
+	if readOldCountString ~= nil then
+		readOldCount = tonumber(readOldCountString)
+	else
+		readOldCount = 0
+	end
+	oldCount:close()
+	savePlayCount = readOldCount + 1
 	romDatabase = io.open("CurrentGameTime.txt","w")
 	romDatabase:write(gameinfo.getromname() .. " play time: " .. saveOldTime)
 	romDatabase:close()
+	timeDatabase = io.open("CurrentGameSwitchCount.txt","w")
+	timeDatabase:write(savePlayCount)
+	timeDatabase:close()
+	
 end
 	
 	
@@ -122,9 +136,11 @@ while i < databaseSize do
 	romSet[i] = userdata.get("rom" .. i)
 end
 
+console.log("Time Limit " .. timeLimit)
+
 --Commenting delay out until we implement it in the setup bot. Feel free to use it yourself.
 --[[
-console.log("Time Limit " .. timeLimit)
+
 
 -- Pause after a swap
 sound = client.GetSoundOn()
@@ -225,6 +241,14 @@ function saveTime(currentRom)
 	end
 	currentGameTime:write(newTime)
 	currentGameTime:close()
+	currentGamePlayCount = io.open(".\\PlayCount\\" .. currentGame .. ".txt","w")
+	if savePlayCount ~= nil then
+		newPlayCount = savePlayCount
+	else
+		newPlayCount = 1
+	end
+	currentGamePlayCount:write(newPlayCount)
+	currentGamePlayCount:close()
 end
 
 if databaseSize == 1 then
