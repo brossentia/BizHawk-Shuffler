@@ -2,6 +2,7 @@
 diff = 0			-- Current frame
 lowTime = 5		-- Min shuffle time
 highTime = 30	-- Max shuffle time
+timeLimit = 5 -- Current time limit
 newGame = 0
 
 romSet = {}
@@ -246,6 +247,7 @@ end
 
 function saveTime(currentRom)
 	currentGameTime = io.open(".\\TimeLogs\\" .. currentGame .. ".txt","w")
+	local newTime = 0
 	if saveOldTime ~= nil then
 		newTime = saveOldTime + timeLimit
 	else
@@ -254,10 +256,9 @@ function saveTime(currentRom)
 	currentGameTime:write(newTime)
 	currentGameTime:close()
 	currentGamePlayCount = io.open(".\\PlayCount\\" .. currentGame .. ".txt","w")
+	local newPlayCount = 1
 	if savePlayCount ~= nil then
 		newPlayCount = savePlayCount
-	else
-		newPlayCount = 1
 	end
 	currentGamePlayCount:write(newPlayCount)
 	currentGamePlayCount:close()
