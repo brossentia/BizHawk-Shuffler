@@ -15,10 +15,11 @@ currentGame = 1
 saveOldTime = 0
 savePlayCount = 0
 
+countdown = false;	-- Countdown is disabled by default
+buffer = 0					-- Buffer for countdown graphics
+
 if userdata.get("countdown") ~= nil then
 	countdown = userdata.get("countdown")
-else
-	countdown = false
 end
 
 if userdata.get("currentChangeCount") ~= nil then -- Syncs up the last time settings changed so it doesn't needlessly read the CurrentROMs folder again.
@@ -221,10 +222,14 @@ function setRomList()
 	end
 end
 
-buffer = 0 -- Sets countdown location. Adding 8 makes it appear correct for the NES.
-if emu.getsystemid() == "NES" then
-	buffer = 8
+function setBuffer()
+	buffer = 0 -- Sets countdown location. Adding 8 makes it appear correct for the NES.
+	if emu.getsystemid() == "NES" then
+		buffer = 8
+	end
 end
+
+setBuffer()
 
 function startCountdown(count) -- Draws the countdown box and text
 	if countdown == true then
