@@ -244,12 +244,6 @@ function startCountdown(count) -- Draws the countdown box and text
 	end
 end
 
-if userdata.get("currentChangeCount") ~= null then
-	currentChangeCount = userdata.get("currentChangeCount")
-else
-	currentChangeCount = 0
-end
-
 function saveTime(currentRom)
 	currentGameTime = io.open(".\\TimeLogs\\" .. currentGame .. ".txt","w")
 	if saveOldTime ~= nil then
