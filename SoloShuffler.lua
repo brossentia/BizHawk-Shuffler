@@ -129,12 +129,15 @@ else
 	console.log("Initial seed " .. seed)
 end
 
-
-i = 0
-while i < databaseSize do
-	i = i + 1
-	romSet[i] = userdata.get("rom" .. i)
+function loadRomList()
+	-- local i = 0
+	for i=0, databaseSize do
+		-- i = i + 1
+		romSet[i] = userdata.get("rom" .. i)
+	end
 end
+
+loadRomList()
 
 console.log("Time Limit " .. timeLimit)
 
