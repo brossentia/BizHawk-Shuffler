@@ -131,7 +131,7 @@ else
 	console.log("Initial seed " .. seed)
 end
 
-function loadRomList()
+function getRomList()
 	-- local i = 0
 	for i=0, databaseSize do
 		-- i = i + 1
@@ -139,7 +139,7 @@ function loadRomList()
 	end
 end
 
-loadRomList()
+getRomList()
 
 console.log("Time Limit " .. timeLimit)
 
@@ -209,11 +209,11 @@ function nextGame(game) -- Changes to the next game and saves the current settin
 		userdata.set("consoleID",emu.getsystemid())
 		userdata.set("countdown",countdown)
 		
-		updateDatabase()
+		setRomList()
 	end	
 end
 
-function updateDatabase()
+function setRomList()
 	console.log("Updating Database...")
 	for x=0, databaseSize do
 		userdata.set("rom" .. x, romSet[x])
