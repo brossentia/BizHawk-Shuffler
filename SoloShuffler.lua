@@ -207,12 +207,16 @@ function nextGame(game) -- Changes to the next game and saves the current settin
 		userdata.set("highTime",highTime)
 		userdata.set("consoleID",emu.getsystemid())
 		userdata.set("countdown",countdown)
-		x = 0
-		while x < databaseSize do
-			x = x + 1
-			userdata.set("rom" .. x, romSet[x])
-		end
+		
+		updateDatabase()
 	end	
+end
+
+function updateDatabase()
+	console.log("Updating Database...")
+	for x=0, databaseSize do
+		userdata.set("rom" .. x, romSet[x])
+	end
 end
 
 buffer = 0 -- Sets countdown location. Adding 8 makes it appear correct for the NES.
