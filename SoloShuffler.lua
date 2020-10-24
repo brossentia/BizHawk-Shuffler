@@ -56,8 +56,6 @@ function openCurrentTime(rom)
 
 end
 
-
-
 function ends_with(str, ending)
    return ending == "" or str:sub(-#ending) == ending
 end
@@ -173,18 +171,21 @@ function nextGame(game) -- Changes to the next game and saves the current settin
 			dirLookup(directory)
 			newGame = romSet[1]
 		else
-			ranNumber = math.random(1,databaseSize)
-			if romSet[ranNumber] ~= nil then
-				newGame = romSet[ranNumber]
+			local randNumber = math.random(1,databaseSize)
+			if romSet[randNumber] ~= nil then
+				newGame = romSet[randNumber]
+				-- console.log("Random Number" .. randNumber .. " was in range")
+				-- console.log("Size of romSet: " .. #romSet .. " Size of database: " .. databaseSize)
 			else
+				-- console.log("Random Number was out of range")
 				dirLookup(directory)
-				newGame = userdata.get("rom" .. ranNumber)
+				newGame = userdata.get("rom" .. randNumber)
 				--console.log("Ran dirLookup()")
 			end
 			while currentGame == newGame or newGame == nil do
-				ranNumber = math.random(1,databaseSize)
-				newGame = romSet[ranNumber]
-				console.log("Reroll! " .. ranNumber)
+				randNumber = math.random(1,databaseSize)
+				newGame = romSet[randNumber]
+				console.log("Reroll! " .. randNumber)
 			end
 		end
 		currentGame = newGame
