@@ -1,2 +1,7 @@
-.vscode
+*.vscode
 settings.json
+*.txt
+CompletedROMs/*
+CurrentROMs/*
+PlayCount/*
+TimeLogs/*

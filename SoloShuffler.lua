@@ -2,11 +2,15 @@ diff = 0
 lowTime = 5
 highTime = 30
 newGame = 0
-i = 0
+
+-- i = 0
 x = 0
+
 romSet = {}
+
 gamePath = ".\\CurrentROMs\\"
 settingsPath = "settings.xml"
+
 if userdata.get("countdown") ~= nil then
 	countdown = userdata.get("countdown")
 else
@@ -49,17 +53,17 @@ function openCurrentTime(rom)
 	timeDatabase = io.open("CurrentGameSwitchCount.txt","w")
 	timeDatabase:write(savePlayCount)
 	timeDatabase:close()
-	
+
 end
-	
-	
+
+
 
 function ends_with(str, ending)
    return ending == "" or str:sub(-#ending) == ending
 end
 
 function dirLookup(directory) -- Reads all ROM names in the CurrentROMs folder.
-	i = 0
+	local i = 0
 	for directory in io.popen([[dir ".\CurrentROMs" /b]]):lines() do
 		if ends_with(directory, ".bin") then
 			console.log("SKIP: " .. directory)
