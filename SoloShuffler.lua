@@ -1,27 +1,25 @@
-diff = 0
-lowTime = 5
-highTime = 30
+-- Define Globals
+diff = 0			-- Current frame
+lowTime = 5		-- Min shuffle time
+highTime = 30	-- Max shuffle time
 newGame = 0
-
--- i = 0
-x = 0
 
 romSet = {}
 
 gamePath = ".\\CurrentROMs\\"
 settingsPath = "settings.xml"
 
+currentChangeCount = 0	-- Num times a game has been swapped to
+currentGame = 1
+
+saveOldTime = 0
+savePlayCount = 0
+
 if userdata.get("countdown") ~= nil then
 	countdown = userdata.get("countdown")
 else
 	countdown = false
 end
-currentChangeCount = 0
-currentGame = 1
-c = {}
-readOldTime = ""
-saveOldTime = 0
-savePlayCount = 0
 
 if userdata.get("currentChangeCount") ~= nil then -- Syncs up the last time settings changed so it doesn't needlessly read the CurrentROMs folder again.
 	currentChangeCount = userdata.get("currentChangeCount")
@@ -29,24 +27,27 @@ end
 databaseSize = userdata.get("databaseSize")
 
 function openCurrentTime(rom)
-	oldTime = io.open(".\\TimeLogs\\" .. currentGame .. ".txt","a+")
-	readOldTimeString = oldTime:read("*line")
+	-- Read playtime of current game from file
+	local oldTime = io.open(".\\TimeLogs\\" .. currentGame .. ".txt","a+")
+	local readOldTimeString = oldTime:read("*line")
+	local readOldTime = "0"
 	if readOldTimeString ~= nil then
 		readOldTime = readOldTimeString
-	else
-		readOldTime = 0
 	end
 	oldTime:close()
 	saveOldTime = readOldTime
-	oldCount = io.open(".\\PlayCount\\" .. currentGame .. ".txt","a+")
-	readOldCountString = oldCount:read("*line")
+
+	-- Read playcount of current game from file
+	local oldCount = io.open(".\\PlayCount\\" .. currentGame .. ".txt","a+")
+	local readOldCountString = oldCount:read("*line")
+	local  readOldCount = 0
 	if readOldCountString ~= nil then
 		readOldCount = tonumber(readOldCountString)
-	else
-		readOldCount = 0
 	end
 	oldCount:close()
 	savePlayCount = readOldCount + 1
+
+	-- Update database with time and count info
 	romDatabase = io.open("CurrentGameTime.txt","w")
 	romDatabase:write(gameinfo.getromname() .. " play time: " .. saveOldTime)
 	romDatabase:close()
