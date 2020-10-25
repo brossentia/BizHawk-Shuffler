@@ -204,16 +204,19 @@ function nextGame(game) -- Changes to the next game and saves the current settin
 		savestate.loadslot(1)
 		console.log(currentGame .. " loaded!")
 		userdata.set("currentGame",currentGame)
+		userdata.set("currentChangeCount",currentChangeCount) -- Only needs to update if the game has changed
+
+		romDatabase = io.open("CurrentROM.txt","w") -- Update CurrentROM file
+		romDatabase:write(gameinfo.getromname())
+		romDatabase:close()
 	end
 	-- Always do these things
 	userdata.set("timeLimit",timeLimit)
-	romDatabase = io.open("CurrentROM.txt","w")
-	romDatabase:write(gameinfo.getromname())
-	romDatabase:close()
+	
 	--console.log(emu.getsystemid())
 	randIncrease = math.random(1,20)
 	userdata.set("seed",seed + randIncrease) -- Changes the seed so the next game/time don't follow a pattern.
-	userdata.set("currentChangeCount",currentChangeCount)
+	
 	userdata.set("databaseSize",databaseSize)
 	userdata.set("lowTime",lowTime)
 	userdata.set("highTime",highTime)
@@ -271,9 +274,9 @@ function saveTime(currentRom)
 	currentGamePlayCount:close()
 end
 
-if databaseSize == 1 then
+--[[if databaseSize == 1 then
 	timeLimit = 6000
-end
+end]]
 
 while true do -- The main cycle that causes the emulator to advance and trigger a game switch.
 	if (diff >= timeLimit - 180) then
