@@ -12,6 +12,7 @@ gamePath = ".\\CurrentROMs\\"
 settingsPath = "settings.xml"
 
 currentChangeCount = 0	-- Num times a game has been swapped to
+changedRomCount = 0
 currentGame = 1
 
 saveOldTime = 0
@@ -108,7 +109,7 @@ function getSettings(filename) -- Gets the settings saved by the RaceShufflerSet
 		countdown = true
 	else
 		countdown = false
-		console.log(tostring(settingsValue["value5"]))
+		console.log("Countdown: " .. tostring(settingsValue["value5"]))
 	end	
 end
 
@@ -165,34 +166,37 @@ function cleanup()
 end
 
 function nextGame(game) -- Changes to the next game and saves the current settings into userdata
-	if databaseSize > 0 then
-		getSettings(settingsPath)
-		diff = 0
-		if currentChangeCount < changedRomCount then -- Only do dirLookup() if settings have changed
-			dirLookup(directory)
-			currentChangeCount = changedRomCount
-		end
-		if databaseSize == 1 then
-			dirLookup(directory)
-			newGame = romSet[1]
+	diff = 0
+	getSettings(settingsPath)	-- Check for changes to settings, roms
+	if currentChangeCount < changedRomCount then -- Only do dirLookup() if settings have changed
+		dirLookup(directory)
+		currentChangeCount = changedRomCount
+	end
+	
+	if databaseSize == 0 then
+		do return end
+	elseif databaseSize == 1 then
+		newGame = romSet[1]
+	else
+		-- Select Game
+		local randNumber = math.random(1,databaseSize)
+		if romSet[randNumber] ~= nil then
+			newGame = romSet[randNumber]
 		else
-			local randNumber = math.random(1,databaseSize)
-			if romSet[randNumber] ~= nil then
-				newGame = romSet[randNumber]
-				-- console.log("Random Number" .. randNumber .. " was in range")
-				-- console.log("Size of romSet: " .. #romSet .. " Size of database: " .. databaseSize)
-			else
-				-- console.log("Random Number was out of range")
-				dirLookup(directory)
-				newGame = userdata.get("rom" .. randNumber)
-				--console.log("Ran dirLookup()")
-			end
-			while currentGame == newGame or newGame == nil do
-				randNumber = math.random(1,databaseSize)
-				newGame = romSet[randNumber]
-				console.log("Reroll! " .. randNumber)
-			end
+			dirLookup(directory)
+			newGame = userdata.get("rom" .. randNumber)
 		end
+		-- Reroll game if you get the same one twice
+		while currentGame == newGame or newGame == nil do
+			randNumber = math.random(1,databaseSize)
+			newGame = romSet[randNumber]
+			console.log("Reroll! " .. randNumber)
+		end
+
+	end
+
+	-- Swap games
+	if currentGame ~= newGame then
 		currentGame = newGame
 		userdata.set("first",1)
 		savestate.saveslot(1)
@@ -200,22 +204,23 @@ function nextGame(game) -- Changes to the next game and saves the current settin
 		savestate.loadslot(1)
 		console.log(currentGame .. " loaded!")
 		userdata.set("currentGame",currentGame)
-		userdata.set("timeLimit",timeLimit)
-		romDatabase = io.open("CurrentROM.txt","w")
-		romDatabase:write(gameinfo.getromname())
-		romDatabase:close()
-		--console.log(emu.getsystemid())
-		randIncrease = math.random(1,20)
-		userdata.set("seed",seed + randIncrease) -- Changes the seed so the next game/time don't follow a pattern.
-		userdata.set("currentChangeCount",currentChangeCount)
-		userdata.set("databaseSize",databaseSize)
-		userdata.set("lowTime",lowTime)
-		userdata.set("highTime",highTime)
-		userdata.set("consoleID",emu.getsystemid())
-		userdata.set("countdown",countdown)
-		
-		setRomList()
-	end	
+	end
+	-- Always do these things
+	userdata.set("timeLimit",timeLimit)
+	romDatabase = io.open("CurrentROM.txt","w")
+	romDatabase:write(gameinfo.getromname())
+	romDatabase:close()
+	--console.log(emu.getsystemid())
+	randIncrease = math.random(1,20)
+	userdata.set("seed",seed + randIncrease) -- Changes the seed so the next game/time don't follow a pattern.
+	userdata.set("currentChangeCount",currentChangeCount)
+	userdata.set("databaseSize",databaseSize)
+	userdata.set("lowTime",lowTime)
+	userdata.set("highTime",highTime)
+	userdata.set("consoleID",emu.getsystemid())
+	userdata.set("countdown",countdown)
+	
+	setRomList()
 end
 
 function setRomList()
