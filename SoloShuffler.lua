@@ -4,6 +4,7 @@ lowTime = 5		-- Min shuffle time
 highTime = 30	-- Max shuffle time
 timeLimit = 5 -- Current time limit
 newGame = 0
+seed = 0			-- Random seed
 
 romSet = {}
 
@@ -84,11 +85,11 @@ function getSettings(filename) -- Gets the settings saved by the RaceShufflerSet
 	if fp == nil then 
 		return nil
 	end
-	settingsName = {}
-	settingsValue = {}
-	newLine = "a"
-	newSetting = "a"
-	k = 1
+	--settingsName = {}
+	local settingsValue = {}
+	local newLine = "a"
+	local newSetting = "a"
+	local k = 1
 	for line in fp:lines() do -- Gets lines from the settings xml.
 		newLine = string.match(line,'%l+%u*%l+')
 		newSetting = string.match(line,'%p%a+%p(%w+)')
@@ -101,6 +102,7 @@ function getSettings(filename) -- Gets the settings saved by the RaceShufflerSet
 	fp:close() -- Closes settings.xml
 	lowTime = settingsValue["value2"] -- Stores minimum value
 	highTime = settingsValue["value3"] -- Stores maximum value
+	seed = settingsValue["value4"]		-- Stores current seed
 	changedRomCount = tonumber(settingsValue["value6"]) -- Stores value indicating if ROMs have been changed
 	if settingsValue["value5"] == "true" then
 		countdown = true
@@ -117,7 +119,7 @@ if databaseSize ~= nil then
 	lowTime = userdata.get("lowTime")
 	highTime = userdata.get("highTime")
 	seed = (userdata.get("seed"))
-	math.randomseed(seed)
+	math.randomseed(seed) -- Sets the seed
 	math.random()
 	if lowTime ~= highTime then
 		timeLimit = math.random(lowTime * 60,highTime * 60)
@@ -128,8 +130,8 @@ else
 	getSettings(settingsPath)
 	timeLimit = 5
 	dirLookup(directory)
-	seed = settingsValue["value4"]
-	math.randomseed(seed)
+	--seed = settingsValue["value4"]
+	math.randomseed(seed) -- Sets the seed
 	math.random()
 	console.log("Initial seed " .. seed)
 end
