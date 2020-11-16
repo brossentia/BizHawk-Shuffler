@@ -1,23 +1,29 @@
-diff = 0
-lowTime = 5
-highTime = 30
+-- Define Globals
+diff = 0			-- Current frame
+lowTime = 5		-- Min shuffle time
+highTime = 30	-- Max shuffle time
+timeLimit = 5 -- Current time limit
 newGame = 0
-i = 0
-x = 0
+seed = 0			-- Random seed
+
 romSet = {}
+
 gamePath = ".\\CurrentROMs\\"
 settingsPath = "settings.xml"
-if userdata.get("countdown") ~= nil then
-	countdown = userdata.get("countdown")
-else
-	countdown = false
-end
-currentChangeCount = 0
+
+currentChangeCount = 0	-- Num times a game has been swapped to
+changedRomCount = 0
 currentGame = 1
-c = {}
-readOldTime = ""
+
 saveOldTime = 0
 savePlayCount = 0
+
+countdown = false;	-- Countdown is disabled by default
+buffer = 0					-- Buffer for countdown graphics
+
+if userdata.get("countdown") ~= nil then
+	countdown = userdata.get("countdown")
+end
 
 if userdata.get("currentChangeCount") ~= nil then -- Syncs up the last time settings changed so it doesn't needlessly read the CurrentROMs folder again.
 	currentChangeCount = userdata.get("currentChangeCount")
@@ -25,41 +31,42 @@ end
 databaseSize = userdata.get("databaseSize")
 
 function openCurrentTime(rom)
-	oldTime = io.open(".\\TimeLogs\\" .. currentGame .. ".txt","a+")
-	readOldTimeString = oldTime:read("*line")
+	-- Read playtime of current game from file
+	local oldTime = io.open(".\\TimeLogs\\" .. currentGame .. ".txt","a+")
+	local readOldTimeString = oldTime:read("*line")
+	local readOldTime = "0"
 	if readOldTimeString ~= nil then
 		readOldTime = readOldTimeString
-	else
-		readOldTime = 0
 	end
 	oldTime:close()
 	saveOldTime = readOldTime
-	oldCount = io.open(".\\PlayCount\\" .. currentGame .. ".txt","a+")
-	readOldCountString = oldCount:read("*line")
+
+	-- Read playcount of current game from file
+	local oldCount = io.open(".\\PlayCount\\" .. currentGame .. ".txt","a+")
+	local readOldCountString = oldCount:read("*line")
+	local  readOldCount = 0
 	if readOldCountString ~= nil then
 		readOldCount = tonumber(readOldCountString)
-	else
-		readOldCount = 0
 	end
 	oldCount:close()
 	savePlayCount = readOldCount + 1
+
+	-- Update database with time and count info
 	romDatabase = io.open("CurrentGameTime.txt","w")
 	romDatabase:write(gameinfo.getromname() .. " play time: " .. saveOldTime)
 	romDatabase:close()
 	timeDatabase = io.open("CurrentGameSwitchCount.txt","w")
 	timeDatabase:write(savePlayCount)
 	timeDatabase:close()
-	
+
 end
-	
-	
 
 function ends_with(str, ending)
    return ending == "" or str:sub(-#ending) == ending
 end
 
 function dirLookup(directory) -- Reads all ROM names in the CurrentROMs folder.
-	i = 0
+	local i = 0
 	for directory in io.popen([[dir ".\CurrentROMs" /b]]):lines() do
 		if ends_with(directory, ".bin") then
 			console.log("SKIP: " .. directory)
@@ -79,11 +86,11 @@ function getSettings(filename) -- Gets the settings saved by the RaceShufflerSet
 	if fp == nil then 
 		return nil
 	end
-	settingsName = {}
-	settingsValue = {}
-	newLine = "a"
-	newSetting = "a"
-	k = 1
+	--settingsName = {}
+	local settingsValue = {}
+	local newLine = "a"
+	local newSetting = "a"
+	local k = 1
 	for line in fp:lines() do -- Gets lines from the settings xml.
 		newLine = string.match(line,'%l+%u*%l+')
 		newSetting = string.match(line,'%p%a+%p(%w+)')
@@ -96,12 +103,13 @@ function getSettings(filename) -- Gets the settings saved by the RaceShufflerSet
 	fp:close() -- Closes settings.xml
 	lowTime = settingsValue["value2"] -- Stores minimum value
 	highTime = settingsValue["value3"] -- Stores maximum value
+	seed = settingsValue["value4"]		-- Stores current seed
 	changedRomCount = tonumber(settingsValue["value6"]) -- Stores value indicating if ROMs have been changed
 	if settingsValue["value5"] == "true" then
 		countdown = true
 	else
 		countdown = false
-		console.log(tostring(settingsValue["value5"]))
+		console.log("Countdown: " .. tostring(settingsValue["value5"]))
 	end	
 end
 
@@ -112,7 +120,7 @@ if databaseSize ~= nil then
 	lowTime = userdata.get("lowTime")
 	highTime = userdata.get("highTime")
 	seed = (userdata.get("seed"))
-	math.randomseed(seed)
+	math.randomseed(seed) -- Sets the seed
 	math.random()
 	if lowTime ~= highTime then
 		timeLimit = math.random(lowTime * 60,highTime * 60)
@@ -123,18 +131,21 @@ else
 	getSettings(settingsPath)
 	timeLimit = 5
 	dirLookup(directory)
-	seed = settingsValue["value4"]
-	math.randomseed(seed)
+	--seed = settingsValue["value4"]
+	math.randomseed(seed) -- Sets the seed
 	math.random()
 	console.log("Initial seed " .. seed)
 end
 
-
-i = 0
-while i < databaseSize do
-	i = i + 1
-	romSet[i] = userdata.get("rom" .. i)
+function getRomList()
+	-- local i = 0
+	for i=0, databaseSize do
+		-- i = i + 1
+		romSet[i] = userdata.get("rom" .. i)
+	end
 end
+
+getRomList()
 
 console.log("Time Limit " .. timeLimit)
 
@@ -155,31 +166,37 @@ function cleanup()
 end
 
 function nextGame(game) -- Changes to the next game and saves the current settings into userdata
-	if databaseSize > 0 then
-		getSettings(settingsPath)
-		diff = 0
-		if currentChangeCount < changedRomCount then -- Only do dirLookup() if settings have changed
-			dirLookup(directory)
-			currentChangeCount = changedRomCount
-		end
-		if databaseSize == 1 then
-			dirLookup(directory)
-			newGame = romSet[1]
+	diff = 0
+	getSettings(settingsPath)	-- Check for changes to settings, roms
+	if currentChangeCount < changedRomCount then -- Only do dirLookup() if settings have changed
+		dirLookup(directory)
+		currentChangeCount = changedRomCount
+	end
+	
+	if databaseSize == 0 then
+		do return end
+	elseif databaseSize == 1 then
+		newGame = romSet[1]
+	else
+		-- Select Game
+		local randNumber = math.random(1,databaseSize)
+		if romSet[randNumber] ~= nil then
+			newGame = romSet[randNumber]
 		else
-			ranNumber = math.random(1,databaseSize)
-			if romSet[ranNumber] ~= nil then
-				newGame = romSet[ranNumber]
-			else
-				dirLookup(directory)
-				newGame = userdata.get("rom" .. ranNumber)
-				--console.log("Ran dirLookup()")
-			end
-			while currentGame == newGame or newGame == nil do
-				ranNumber = math.random(1,databaseSize)
-				newGame = romSet[ranNumber]
-				console.log("Reroll! " .. ranNumber)
-			end
+			dirLookup(directory)
+			newGame = userdata.get("rom" .. randNumber)
 		end
+		-- Reroll game if you get the same one twice
+		while currentGame == newGame or newGame == nil do
+			randNumber = math.random(1,databaseSize)
+			newGame = romSet[randNumber]
+			console.log("Reroll! " .. randNumber)
+		end
+
+	end
+
+	-- Swap games
+	if currentGame ~= newGame then
 		currentGame = newGame
 		userdata.set("first",1)
 		savestate.saveslot(1)
@@ -187,31 +204,43 @@ function nextGame(game) -- Changes to the next game and saves the current settin
 		savestate.loadslot(1)
 		console.log(currentGame .. " loaded!")
 		userdata.set("currentGame",currentGame)
-		userdata.set("timeLimit",timeLimit)
-		romDatabase = io.open("CurrentROM.txt","w")
+		userdata.set("currentChangeCount",currentChangeCount) -- Only needs to update if the game has changed
+
+		romDatabase = io.open("CurrentROM.txt","w") -- Update CurrentROM file
 		romDatabase:write(gameinfo.getromname())
 		romDatabase:close()
-		--console.log(emu.getsystemid())
-		randIncrease = math.random(1,20)
-		userdata.set("seed",seed + randIncrease) -- Changes the seed so the next game/time don't follow a pattern.
-		userdata.set("currentChangeCount",currentChangeCount)
-		userdata.set("databaseSize",databaseSize)
-		userdata.set("lowTime",lowTime)
-		userdata.set("highTime",highTime)
-		userdata.set("consoleID",emu.getsystemid())
-		userdata.set("countdown",countdown)
-		x = 0
-		while x < databaseSize do
-			x = x + 1
-			userdata.set("rom" .. x, romSet[x])
-		end
-	end	
+	end
+	-- Always do these things
+	userdata.set("timeLimit",timeLimit)
+	
+	--console.log(emu.getsystemid())
+	randIncrease = math.random(1,20)
+	userdata.set("seed",seed + randIncrease) -- Changes the seed so the next game/time don't follow a pattern.
+	
+	userdata.set("databaseSize",databaseSize)
+	userdata.set("lowTime",lowTime)
+	userdata.set("highTime",highTime)
+	userdata.set("consoleID",emu.getsystemid())
+	userdata.set("countdown",countdown)
+	
+	setRomList()
 end
 
-buffer = 0 -- Sets countdown location. Adding 8 makes it appear correct for the NES.
-if emu.getsystemid() == "NES" then
-	buffer = 8
+function setRomList()
+	console.log("Updating Database...")
+	for x=0, databaseSize do
+		userdata.set("rom" .. x, romSet[x])
+	end
 end
+
+function setBuffer()
+	buffer = 0 -- Sets countdown location. Adding 8 makes it appear correct for the NES.
+	if emu.getsystemid() == "NES" then
+		buffer = 8
+	end
+end
+
+setBuffer()
 
 function startCountdown(count) -- Draws the countdown box and text
 	if countdown == true then
@@ -226,14 +255,9 @@ function startCountdown(count) -- Draws the countdown box and text
 	end
 end
 
-if userdata.get("currentChangeCount") ~= null then
-	currentChangeCount = userdata.get("currentChangeCount")
-else
-	currentChangeCount = 0
-end
-
 function saveTime(currentRom)
 	currentGameTime = io.open(".\\TimeLogs\\" .. currentGame .. ".txt","w")
+	local newTime = 0
 	if saveOldTime ~= nil then
 		newTime = saveOldTime + timeLimit
 	else
@@ -242,18 +266,17 @@ function saveTime(currentRom)
 	currentGameTime:write(newTime)
 	currentGameTime:close()
 	currentGamePlayCount = io.open(".\\PlayCount\\" .. currentGame .. ".txt","w")
+	local newPlayCount = 1
 	if savePlayCount ~= nil then
 		newPlayCount = savePlayCount
-	else
-		newPlayCount = 1
 	end
 	currentGamePlayCount:write(newPlayCount)
 	currentGamePlayCount:close()
 end
 
-if databaseSize == 1 then
+--[[if databaseSize == 1 then
 	timeLimit = 6000
-end
+end]]
 
 while true do -- The main cycle that causes the emulator to advance and trigger a game switch.
 	if (diff >= timeLimit - 180) then
