@@ -158,6 +158,12 @@ function nextGame(game) -- Changes to the next game and saves the current settin
 	if databaseSize > 0 then
 		getSettings(settingsPath)
 		diff = 0
+		if userdata.get("currentGameCounter") ~= nil then -- Allows for sequential play order
+			currentGameCounter = userdata.get("currentGameCounter");
+		else
+			currentGameCounter = 1
+		end
+		console.log(currentGameCounter)
 		if currentChangeCount < changedRomCount then -- Only do dirLookup() if settings have changed
 			dirLookup(directory)
 			currentChangeCount = changedRomCount
@@ -166,7 +172,7 @@ function nextGame(game) -- Changes to the next game and saves the current settin
 			dirLookup(directory)
 			newGame = romSet[1]
 		else
-			ranNumber = math.random(1,databaseSize)
+			ranNumber = currentGameCounter
 			if romSet[ranNumber] ~= nil then
 				newGame = romSet[ranNumber]
 			else
@@ -175,7 +181,7 @@ function nextGame(game) -- Changes to the next game and saves the current settin
 				--console.log("Ran dirLookup()")
 			end
 			while currentGame == newGame or newGame == nil do
-				ranNumber = math.random(1,databaseSize)
+				ranNumber = currentGameCounter
 				newGame = romSet[ranNumber]
 				console.log("Reroll! " .. ranNumber)
 			end
@@ -195,6 +201,11 @@ function nextGame(game) -- Changes to the next game and saves the current settin
 		randIncrease = math.random(1,20)
 		userdata.set("seed",seed + randIncrease) -- Changes the seed so the next game/time don't follow a pattern.
 		userdata.set("currentChangeCount",currentChangeCount)
+		if currentGameCounter > databaseSize - 1 then
+			userdata.set("currentGameCounter", 1)
+		else
+			userdata.set("currentGameCounter", currentGameCounter + 1)
+		end
 		userdata.set("databaseSize",databaseSize)
 		userdata.set("lowTime",lowTime)
 		userdata.set("highTime",highTime)
