@@ -6,6 +6,7 @@ i = 0
 x = 0
 romSet = {}
 gamePath = ".\\CurrentROMs\\"
+savePath = ".\\CurrentSaves\\"
 settingsPath = "settings.xml"
 if userdata.get("countdown") ~= nil then
 	countdown = userdata.get("countdown")
@@ -180,11 +181,11 @@ function nextGame(game) -- Changes to the next game and saves the current settin
 				console.log("Reroll! " .. ranNumber)
 			end
 		end
-		currentGame = newGame
 		userdata.set("first",1)
-		savestate.saveslot(1)
+		savestate.save(savePath .. currentGame .. ".save")
+		currentGame = newGame
 		client.openrom(gamePath .. currentGame)
-		savestate.loadslot(1)
+		savestate.load(savePath .. currentGame .. ".save")
 		console.log(currentGame .. " loaded!")
 		userdata.set("currentGame",currentGame)
 		userdata.set("timeLimit",timeLimit)
