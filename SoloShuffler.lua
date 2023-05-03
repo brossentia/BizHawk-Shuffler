@@ -184,7 +184,6 @@ function nextGame(game) -- Changes to the next game and saves the current settin
 		userdata.set("first",1)
 		savestate.saveslot(1)
 		client.openrom(gamePath .. currentGame)
-		savestate.loadslot(1)
 		console.log(currentGame .. " loaded!")
 		userdata.set("currentGame",currentGame)
 		userdata.set("timeLimit",timeLimit)
@@ -254,6 +253,12 @@ end
 if databaseSize == 1 then
 	timeLimit = 6000
 end
+
+if readOldTime ~= 0 then
+	savestate.loadslot(1)
+end
+
+gui.clearGraphics()
 
 while true do -- The main cycle that causes the emulator to advance and trigger a game switch.
 	if (diff >= timeLimit - 180) then
